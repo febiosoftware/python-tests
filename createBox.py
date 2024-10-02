@@ -8,9 +8,12 @@
 #    "position" : { "type" : "vec3", "value" : [0,0,0] } 
 #  }
 # }
-from fbs import ui, args
+from fbs import mdl, args
 W = args['Width']
 H = args['Height']
 D = args['Depth']
 pos = args['position']
-ui.GBox(pos, W, H, D)
+
+box = mdl.create_box("box1", pos, W, H, D)
+gm = mdl.active_model()
+gm.add_object(box)

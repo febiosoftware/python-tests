@@ -6,5 +6,5 @@ from fbs import ui, args
 import time
 
 for i in range(100):
-    ui.setProgress(i)
+    ui.panels.pytools.set_progress(i)
     time.sleep(0.05)

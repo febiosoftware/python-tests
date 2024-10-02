@@ -9,26 +9,34 @@
 #    "Ratio" : 0.5
 #  }
 # }
-from fbs import ui, core, args
-# Make Curve tool
-def makeCurve(File, Radius, Divisions, Segments, Ratio):
-    positions = []
-    
-    with open(File) as f:
-        for line in f.readlines():
-            splitCoords = line.split(",")
-            
-            x = float(splitCoords[0])
-            y = float(splitCoords[1])
-            z = float(splitCoords[2])
-            
-            positions.append(core.vec3d(x,y,z))
-            
-    ui.MeshFromCurve(positions, Radius, divisions=Divisions, segments=Segments, ratio=Ratio)
+from fbs import mdl, core, args
 
+# get the tool's arguments
 file = args['File']
 radius = args['Radius']
 divs = args['Division']
 segs = args['Segments']
 ratio = args['Ratio']
-makeCurve(file, radius, divs, segs, ratio)
+
+# read the points from a file
+positions = []
+with open(file) as f:
+    for line in f.readlines():
+        splitCoords = line.split(",")
+        x = float(splitCoords[0])
+        y = float(splitCoords[1])
+        z = float(splitCoords[2])
+        
+        positions.append(core.vec3d(x,y,z))
+
+# create a new mesh
+mesh = mdl.mesh_from_curve(positions, radius, divs, segs, ratio)
+
+# construct a mesh-object
+o = mdl.create_mesh_object("curve", mesh)
+
+# get the currently active model
+gm = mdl.active_model()
+
+# add it to the model
+gm.add_object(o)
