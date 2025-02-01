@@ -9,7 +9,7 @@
 #      "intersect" : { "type" : "bool", "value" : 0 }
 #    }
 # }
-from fbs import ui, mdl, core, args
+from fbs import ui, mdl, core, mesh, args
 # Add Springs tool
 
 class Spring:
@@ -29,32 +29,105 @@ class Spring:
         
         self.r1 = core.vec3d(x,y,z)
 
-Name = args['name']
-File = args['file']
+# get all the nodes of the object's mesh
+# in global coordinates
+def GetAllNodes(o):
+    m = o.GetFEMesh()
+    N = m.Nodes()
+    allNodes = []
+    for i in range(0,N):
+        ni = m.Node(i)
+        ri = m.LocalToGlobal(ni.pos)
+        allNodes.append(ri)
+    return allNodes
+
+# finds the closest node (or -1 if not found)
+def FindClosestNode(nodeList, r, tol):
+    N = len(nodeList)
+    imin = -1
+    l2min = 0.0
+    for i in range(0,N):
+        ri = nodeList[i]
+        l2 = (r - ri).SqrLength()
+        if (imin == -1) or (l2 < l2min):
+            imin = i
+            l2min = l2
+
+    if (imin != -1) and (l2min < tol*tol):
+        return imin
+    
+    return -1
+
+# This function finds the closest node on the object's mesh (using the pre-calculated node position list).
+# If it exists, then it's marked as a required node. If not, it gets added to the object.
+def FindOrMakeGNode(o, nodeList, r, tol):
+    N = len(nodeList)
+    imin = FindClosestNode(nodeList, r, tol)
+
+    if (imin != -1):
+        return o.MakeGNode(imin)
+    
+    return o.AddNode(r)
+
+def IntersectWithObject(o, r0, r1, tol):
+    femesh = o.GetFEMesh()
+
+    n = r1 - r0
+    n.Normalize()
+
+    intersections = mesh.FindAllIntersections(femesh, r0, n, True)
+    for i in range(0, len(intersections)):
+        q = intersections[i]
+
+        # does the projection lie within tolerance
+        d = (q - r0).Length()
+        if d < tol:
+            # does it decrease the distance
+            if ((r1 - q).Length() < (r1 - r0).Length()):
+                r0 = q
+
+    intersections = mesh.FindAllIntersections(femesh, r1, -n, True)
+    for i in range(0, len(intersections)):
+        q = intersections[i]
+
+        # does the projection lie within tolerance
+        d = (q - r1).Length()
+        if (d < tol):
+            # does it decrease the distance
+            if ((q - r0).Length() < (r1 - r0).Length()):
+                r1 = q
+
+name = args['name']
+file = args['file']
 tol  = args['tol']
 type = args['Type']
 intersect = args['intersect']
-Type = type[1]
+typeStr = type[1]
 
 springs = []
 
-ui.panels.pytools.set_progress_text("Reading springs from " + File)
-with open(File) as f:
+ui.panels.pytools.SetProgressText("Reading springs from " + file)
+with open(file) as f:
     for line in f.readlines():
         springs.append(Spring(line))
 
-springSet = mdl.SpringSet(Name, Type)
+springSet = mdl.AddSpringSet(name, typeStr)
 
-ui.panels.pytools.set_progress_text("Adding springs to springset")
+# get the currently selected object
+o = mdl.GetActiveObject()
+
+allNodes = GetAllNodes(o)
+
+ui.panels.pytools.SetProgressText("Adding springs to springset")
 index = 0
 for spring in springs:
-    ui.panels.pytools.set_progress(index/len(springs))
+    ui.panels.pytools.SetProgress(index/len(springs))
     index += 1
 
     if intersect:
-        mdl.intersect_with_object(spring.r0, spring.r1, tol)
+        IntersectWithObject(o, spring.r0, spring.r1, tol)
+
+    n1 = FindOrMakeGNode(o, allNodes, spring.r0, tol)
+    n2 = FindOrMakeGNode(o, allNodes, spring.r1, tol)
     
-    n1 = mdl.find_or_make_node(spring.r0, tol)
-    n2 = mdl.find_or_make_node(spring.r1, tol)
-        
-    springSet.add_spring(n1, n2)
+    springSet.AddSpring(n1, n2)

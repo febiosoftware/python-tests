@@ -1,6 +1,6 @@
 # @fbs {
-#  "name" : "Create Box",
-#  "info" : "This tool creates a box.",
+#  "name" : "Create Simple Model",
+#  "info" : "This tool creates a simple model.",
 #  "args" : { 
 #    "Width"  : 1, 
 #    "Depth"  : 1, 
@@ -21,3 +21,12 @@ box.SetPosition(pos)
 
 # add it to the active model
 mdl.AddObject(box)
+
+# create a material
+mat = mdl.AddMaterial("Mat1", "neo-Hookean")
+
+# assign it to the box
+mdl.AssignMaterial(box, mat)
+
+# create a step
+step = mdl.AddStep("Step1", "solid")
