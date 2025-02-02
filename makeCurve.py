@@ -96,4 +96,5 @@ o = geom.GMeshObject(mesh)
 o.SetName("curve")
 
 # add it to the model
-mdl.AddObject(o)
+fem = mdl.GetActiveModel()
+fem.AddObject(o)

@@ -20,13 +20,14 @@ box.SetName("box1")
 box.SetPosition(pos)
 
 # add it to the active model
-mdl.AddObject(box)
+fem = mdl.GetActiveModel()
+fem.AddObject(box)
 
 # create a material
-mat = mdl.AddMaterial("Mat1", "neo-Hookean")
+mat = fem.AddMaterial("Mat1", "neo-Hookean")
 
 # assign it to the box
-mdl.AssignMaterial(box, mat)
+fem.AssignMaterial(box, mat)
 
 # create a step
-step = mdl.AddStep("Step1", "solid")
+step = fem.AddStep("Step1", "solid")

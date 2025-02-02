@@ -20,4 +20,5 @@ box.SetName("box1")
 box.SetPosition(pos)
 
 # add it to the active model
-mdl.AddObject(box)
+fem = mdl.GetActiveModel()
+fem.AddObject(box)

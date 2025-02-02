@@ -111,7 +111,9 @@ with open(file) as f:
     for line in f.readlines():
         springs.append(Spring(line))
 
-springSet = mdl.AddSpringSet(name, typeStr)
+fem = mdl.GetActiveModel()
+
+springSet = fem.AddSpringSet(name, typeStr)
 
 # get the currently selected object
 o = mdl.GetActiveObject()
