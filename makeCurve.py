@@ -48,7 +48,7 @@ def meshFromCurve(points, radius, ndiv, nseg, ratio):
             disc.GetTransform().Rotate(core.quatd(vec1, vec2), points[point - 1])
 
         # Move the disc into position
-        disc.SetPosition(points[point])
+        disc.pos = points[point]
 
         # Add all of the node locations to our vector
         for node in range(0, discMesh.Nodes()):
@@ -93,7 +93,7 @@ mesh = meshFromCurve(positions, radius, divs, segs, ratio)
 
 # construct a mesh-object
 o = geom.GMeshObject(mesh)
-o.SetName("curve")
+o.name = "curve"
 
 # add it to the model
 fem = mdl.GetActiveModel()

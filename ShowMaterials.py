@@ -21,27 +21,27 @@ nmat = fem.Materials()
 print("There are " + str(nmat) + " materials.")
 
 for i in range(nmat):
-    m = fem.GetMaterial(i)
-    name = m.name()
+    m = fem.Material(i)
+    name = m.name
     if ("bone" in name)or("Bone" in name)or("teeth" in name)or("Clavicle" in name)or("Sternum" in name)or("Rib" in name):
         if showBone:
-            m.show()
+            m.Show()
         else:
-            m.hide()
+            m.Hide()
     elif ("skin" in name)or("Skin" in name):
         if showSkin:
-            m.show()
+            m.Show()
         else:
-            m.hide()
+            m.Hide()
     elif ("flesh" in name)or("Flesh" in name)or("cartilage" in name)or("Cartilage" in name):
         if showFlesh:
-            m.show()
+            m.Show()
         else:
-            m.hide()
+            m.Hide()
     else:
         if showMuscle:
-            m.show()
+            m.Show()
         else:
-            m.hide()
+            m.Hide()
 
 print("done")

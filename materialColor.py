@@ -21,15 +21,15 @@ col_skin = args['skin']
 col_muscle = args['muscle']
 
 for i in range(nmat):
-    m = fem.GetMaterial(i)
-    name = m.name()
+    m = fem.Material(i)
+    name = m.name
     if ("skin" in name)or("Skin" in name):
-        m.setColor(col_skin.r, col_skin.g, col_skin.b)
+        m.SetColor(col_skin.r, col_skin.g, col_skin.b)
     elif ("bone" in name)or("Bone" in name)or("teeth" in name)or("Clavicle" in name)or("Sternum" in name)or("Rib" in name):
-        m.setColor(col_bone.r, col_bone.g, col_bone.b)
+        m.SetColor(col_bone.r, col_bone.g, col_bone.b)
     elif ("flesh" in name)or("Flesh" in name)or("cartilage" in name)or("Cartilage" in name):
-        m.setColor(col_flesh.r, col_flesh.g, col_flesh.b)
+        m.SetColor(col_flesh.r, col_flesh.g, col_flesh.b)
     else:
-        m.setColor(col_muscle.r, col_muscle.g, col_muscle.b)
+        m.SetColor(col_muscle.r, col_muscle.g, col_muscle.b)
 
 print("done")

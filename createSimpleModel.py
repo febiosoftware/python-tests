@@ -16,8 +16,8 @@ pos = args['position']
 
 # create the box
 box = geom.GBox(int(W), int(H), int(D))
-box.SetName("box1")
-box.SetPosition(pos)
+box.name = "box1"
+box.pos = pos
 
 # add it to the active model
 fem = mdl.GetActiveModel()

@@ -44,7 +44,7 @@ distanceMap.Apply()
 #   the component (because a distanceMap is a scalar data field it has no components
 #       and so we put a 0 here)
 #   the state that we want to get the data from. Here we get it from the last state
-state = postModel.Evaluate(distanceMap, 0, postModel.GetStates() - 1)
+state = postModel.Evaluate(distanceMap, 0, postModel.States() - 1)
 
 # We loop over our first surface, and print the distanceMap data out for each facet
 for index in surf1:

@@ -10,7 +10,7 @@ dataField = postModel.GetDataField("stress")
 
 # I think this changes the internal state of the post-model.
 # Is this a problem?
-state = postModel.Evaluate(dataField, post.MAT3DS.P1, postModel.GetStates() - 1)
+state = postModel.Evaluate(dataField, post.MAT3DS.P1, postModel.States() - 1)
 
 faceData = state.faceData
 
