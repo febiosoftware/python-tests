@@ -32,7 +32,9 @@ def readPositionsFromFile(filename):
     return positions
 
 def meshFromCurve(points, radius, ndiv, nseg, ratio):
-    disc = geom.GDisc(radius)
+
+    model = mdl.GetActiveModel()
+    disc = model.AddDisc(radius)
     discMesh = disc.CreateMesh(ndiv, nseg, ratio)
 
     nodePositions = []
@@ -83,6 +85,8 @@ def meshFromCurve(points, radius, ndiv, nseg, ratio):
                 # on the far face of the hex element
                 current.SetNode(node + discElement.Nodes(), discElement.Node(node) + discMesh.Nodes() * (point + 1))
 
+    model.DeleteObject(disc)
+
     newMesh.RebuildMesh(60.0, False)
     return newMesh
 
@@ -92,9 +96,6 @@ positions = readPositionsFromFile(file)
 mesh = meshFromCurve(positions, radius, divs, segs, ratio)
 
 # construct a mesh-object
-o = geom.GMeshObject(mesh)
-o.name = "curve"
-
-# add it to the model
 fem = mdl.GetActiveModel()
-fem.AddObject(o)
+o = fem.AddMeshObject(mesh)
+o.name = "curve"

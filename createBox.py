@@ -14,11 +14,10 @@ H = args['Height']
 D = args['Depth']
 pos = args['position']
 
+# get the active model
+fem = mdl.GetActiveModel()
+
 # create the box
-box = geom.GBox(int(W), int(H), int(D))
+box = fem.AddBox(int(W), int(H), int(D))
 box.name = "box1"
 box.pos = pos
-
-# add it to the active model
-fem = mdl.GetActiveModel()
-fem.AddObject(box)
