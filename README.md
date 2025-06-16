@@ -13,6 +13,7 @@ A script containing a python tool will need to do three things:
 1. Define the function that contains the logic of the tool. This function will be called from FBS.
 2. Define a dictionary containing the properties of the tool. 
 3. Add the tool to the UI.
+
 The following sections describe this process in more details.
 
 ## Creating the Tool
@@ -44,7 +45,7 @@ The properties should be defined in the same order as the function arguments. Th
 
 ```
 # to define an enum, specify the string values as a list
-props['enums'  ] = ["Option1", "Option2", "Option3"] # creates an enum property.
+props['enums'] = ["Option1", "Option2", "Option3"] # creates an enum property.
 
 # in the function, this argument will be passed as a tuple
 def f(enums):
