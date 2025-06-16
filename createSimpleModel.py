@@ -1,31 +1,29 @@
-# @fbs {
-#  "name" : "Create Simple Model",
-#  "info" : "This tool creates a simple model.",
-#  "args" : { 
-#    "Width"  : 1, 
-#    "Depth"  : 1, 
-#    "Height" : 1, 
-#    "position" : { "type" : "vec3", "value" : [0,0,0] } 
-#  }
-# }
-from fbs import mdl, geom, args
-W = args['Width']
-H = args['Height']
-D = args['Depth']
-pos = args['position']
+from fbs import *
 
-fem = mdl.GetActiveModel()
+def createSimpleModel(Width, Height, Depth, position):
 
-# create the box
-box = fem.AddBox(int(W), int(H), int(D))
-box.name = "box1"
-box.pos = pos
+    fem = mdl.GetActiveModel()
 
-# create a material
-mat = fem.AddMaterial("Mat1", "neo-Hookean")
+    # create the box
+    box = fem.AddBox(Width, Height, Depth)
+    box.name = "box1"
+    box.pos = position
 
-# assign it to the box
-fem.AssignMaterial(box, mat)
+    # create a material
+    mat = fem.AddMaterial("Mat1", "neo-Hookean")
 
-# create a step
-step = fem.AddStep("Step1", "solid")
+    # assign it to the box
+    fem.AssignMaterial(box, mat)
+
+    # create a step
+    step = fem.AddStep("Step1", "solid")
+
+# Build the tool's property list
+props = {}
+props['Width'] = 1.0
+props['Height'] = 1.0
+props['Depth'] = 1.0
+props['position'] = core.vec3d(0,0,0)
+
+# add the tool
+ui.panels.pytools.AddTool("Simple Model", props, createSimpleModel, "Create a simple model.")

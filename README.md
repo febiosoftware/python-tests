@@ -3,88 +3,87 @@ This repository contains examples of python tools that can be used in FEBioStudi
 
 ## Introduction
 This document describes the process of creating python tools for FEBioStudio3. 
-Creating a tool is as simple as loading a python script, however, to use the full functionality, it is necessary to embed meta information in the python script. The following sections describe the details. 
-
-## script preamble
-To integrate the python script as a tool, FEBioStudio looks for a preamble in the python source file, which is a section defined in a python comment block at the top of the file. The preamble is optional, but only by adding this preamble FBS can generate UI elements that correspond to variables in the python file.
-
-The preamble starts with the identifier `@fbs`
+At the start of the script, import the **fbs** module to gain access to the FEBio Studio Python interface.
 
 ```
-# @fbs {
-# }
+from fbs import *
 ```
 
-Inside the curly braces, a json object defines the contents of the preamble. Currenty, the following list of properties can be added. 
+A script containing a python tool will need to do three things: 
+1. Define the function that contains the logic of the tool. This function will be called from FBS.
+2. Define a dictionary containing the properties of the tool. 
+3. Add the tool to the UI.
+The following sections describe this process in more details.
 
-* **name** : This defines the name of the tool. If omitted, the name will be extracted from the script's filename. (usually, the filename with the .py suffix removed)
-* **info** : A description of the tool that will be displayed at the top of the tool's widget in FEBio Studio.
-* **args** : a dictionary of elements that define the parameters of the script, i.e. the values that the user is expected to provide. 
+## Creating the Tool
 
-A simple preamble that defines the tool's name and info property follows. The `args` property is discussed below.  
-```
-# @fbs {
-#   "name" : "My first tool",
-#   "info" : "This is my first python tool!"
-# }
-```
+### Define a python function
+The logic of the tool should be coded in a Python function. Please note that the name given to the parameters (if any) must match the names defined in the dictionary that defines the tool's properties, as detailed below. 
+The Python script can contain multiple functions (or other Python objects), but only one function can execute the tool's logic.
 
-## args property
-The `args` property is where the real power lies. This property defines a dictionary of the tool's parameters. Each entry consists of a name and value that defines the type and contents of the parameter. For each parameter, a UI element will be created in FEBio Studio that will allow users to enter values for the parameter. The parameter value is defined either via a short syntax or an extended syntax. The short syntax is only supported for string and float parameters. All other parameters require the extended syntax. 
+### Define the tool's properties
+A tool's properties are specified in a Python dictionary. The entries in the dictionary are key-value pairs. The key defines the property name (and must match the parameter names of the Python function), and the value sets the initial value of the corresponding property. The implied type of this initial value will define the UI widget that will be assigned to the property. 
 
-For float and string parameters, the value can be entered immediately following the parameter's name. The provided value is used as the default value for the corresponding UI element. 
-```
-# @fbs {
-#   "args" : {
-#       "name" : "",
-#       "age"  : 42
-#   }
-# }
-```
-
-For most parameters, the extended syntax needs to be used. This syntax requires that the value of the parameter is defined itself by a dictionary of predefined attributes. The following attributes are supported (and currently required!)
-
-* **type** : defines the type of the parameter. The type will define what values are allowed and what UI element will be chosen to represent the parameter in the UI.
-* **value** : this defines the initial value for the parameter.
-
-The following values can be specified for **type**
-
-* **bool** : a boolean parameter that can only take on the values 0 and 1. A checkbox is used to represent this parameter in the UI
-* **int** : an integer parameter
-* **float** : a floating point value (double precision variables are used to store the value)
-* **string** : a string parameter
-* **url** : a string parameter that is interpreted as a url. The UI element will allow users to select a file from the system.
-* **enum** : a parameter that can only take on discrete values. The value attribute lists the possible values. A dropdown box is used to represent the property. (The initial value will always be the first item in the list.)
-* **vec3** : a parameter that represents a 3D vector. 
+For example, this code extract shows how to create different properties.
 
 ```
-# @fbs {
-#   "args" : {
-#       "boolVal"  : { "type" = "bool", "value" = 1 },
-#       "intVal"   : { "type" = "int", "value" = 42 },
-#       "floatVal" : { "type" = "float", "value" = 3.14 },
-#       "stringVal": { "type" = "string", "value" = "eureka!" },
-#       "urlVal"   : { "type" = "url", "value" = "C:\path\to\top_secret\file.txt" },
-#       "enumVal"  : { "type" = "enum", "value" = ["red", "green", "blue"] },
-#       "vec3Val"  : { "type" = "vec3", "value" = [0, 1, 2] }
-#   }
-# }
+props = {} # start with an empty dictionary
+props['name'   ] = "John Doe"  # creates a string property
+props['age'    ] = 39          # creates an int property
+props['income' ] = 45000.0     # creates a float property
+props['married'] = True        # creates a bool property
+props['file'   ] = "@url:C:/home/folder/data.txt"   # creates a resource property. The initial value is set to "C:/home/folder/data.txt"
+props['enums'  ] = ["Option1", "Option2", "Option3"] # creates an enum property.  
 ```
 
-## Accessing `args` in Python
-After the users enters the parameter values in the UI, the script can be run. At that point, the values of the parameters need to become accessible from the python script. The parameters can be accessed from the `args` attribute of the `fbs` module. This attribute is defined as a dictionary that contains the parameter names as keys. 
+Note that in order to differentiate between a string input field and a url input file, start the initial value with "@url:" (The colon is required). The input widget will then offer users a way to select a file using a standard file open dialog. 
 
-For example, consider the following python code that defines a single string parameter, called `name`. 
+To define enum properties, set the value to a list of strings. The input widget will show a combo box that lists the specified strings as options.
+
+The properties should be defined in the same order as the function arguments. The types of the function arguments will be the same as the corresponding types of the properties, except for enum properties. For enum properties, the parameter that will be passed to the function is a tuple that has two elements. The first element is an int that contains the zero-based index into the options list. The second element is the corresponding string of the option. 
 
 ```
-# @fbs {
-#   "args" : {
-#       "name"  : ""
-#   }
-# }
+# to define an enum, specify the string values as a list
+props['enums'  ] = ["Option1", "Option2", "Option3"] # creates an enum property.
 
-from fbs import args
-print(args['name'])
+# in the function, this argument will be passed as a tuple
+def f(enums):
+    optionIndex  = enums[0]    # contains the zero-based index into the options list
+    optionString = enums[1]    # contains the string value of the corresponding option
 ```
 
-The value of the `name` parameter is accessed in python from the `args` dictionary defined as an attribute of the fbs module. 
+### Add the tool to the UI
+
+To add the tool to the UI, use the **fbs.ui.panels.pytools.AddTool** function. This function requires four parameters.
+
+* **name**  : Specifies the name of the tool. 
+* **props** : The dictionary containing the tool's properties
+* **func**  : The python function that will be called by FBS. 
+* **info**  : (optional) A description of the tool. 
+
+For example:
+(Assume props is a dictionary, and myTool a function)
+```
+ui.panels.pytools.AddTool("My Tool", props, myTool, "My first tool")
+```
+
+## An example
+This example doesn't do anything useful but simply demonstrates a complete example of a python tool. 
+
+```
+# import the fbs modules
+from fbs import *
+
+# this is the function we'll call
+def myFunction(name, age):
+    print(f"{name} is {age} years old")
+
+# the properties
+p = {}
+p['name'] = "John Doe"
+p['age'] = 39
+
+# add it to the UI
+ui.panels.pytools.AddTool("My Tool", p, myFunction)
+
+```

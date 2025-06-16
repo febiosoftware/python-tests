@@ -1,35 +1,31 @@
-# @fbs { 
-#  "name" : "Material color",
-#  "info" : "This tool sets material colors.",
-#  "args" : {
-#     "bone"   : { "type" : "color", "value" : [210, 200, 200] },
-#     "flesh"  : { "type" : "color", "value" : [200, 200, 100] },
-#     "skin"   : { "type" : "color", "value" : [255, 200, 200] },
-#     "muscle" : { "type" : "color", "value" : [150,  50,  50] }
-#  }
-# }
-from fbs import post, core, args
-print("Starting engines ...")
+# This tool demonstrates how to set the material colors in a post model.
+from fbs import *
 
-fem = post.GetActiveModel()
-nmat = fem.Materials()
-print("There are " + str(nmat) + " materials.")
+def setMaterialColors(bone, flesh, skin, muscle):
+    print("Starting engines ...")
 
-col_bone = args['bone']
-col_flesh = args['flesh']
-col_skin = args['skin']
-col_muscle = args['muscle']
+    fem = post.GetActiveModel()
+    nmat = fem.Materials()
+    print("There are " + str(nmat) + " materials.")
 
-for i in range(nmat):
-    m = fem.Material(i)
-    name = m.name
-    if ("skin" in name)or("Skin" in name):
-        m.SetColor(col_skin.r, col_skin.g, col_skin.b)
-    elif ("bone" in name)or("Bone" in name)or("teeth" in name)or("Clavicle" in name)or("Sternum" in name)or("Rib" in name):
-        m.SetColor(col_bone.r, col_bone.g, col_bone.b)
-    elif ("flesh" in name)or("Flesh" in name)or("cartilage" in name)or("Cartilage" in name):
-        m.SetColor(col_flesh.r, col_flesh.g, col_flesh.b)
-    else:
-        m.SetColor(col_muscle.r, col_muscle.g, col_muscle.b)
+    for i in range(nmat):
+        m = fem.Material(i)
+        name = m.name
+        if ("skin" in name)or("Skin" in name):
+            m.SetColor(skin.r, skin.g, skin.b)
+        elif ("bone" in name)or("Bone" in name)or("teeth" in name)or("Clavicle" in name)or("Sternum" in name)or("Rib" in name):
+            m.SetColor(bone.r, bone.g, bone.b)
+        elif ("flesh" in name)or("Flesh" in name)or("cartilage" in name)or("Cartilage" in name):
+            m.SetColor(flesh.r, flesh.g, flesh.b)
+        else:
+            m.SetColor(muscle.r, muscle.g, muscle.b)
 
-print("done")
+    print("done")
+
+# define the tool's props
+props = {}
+props['bone'  ] = core.color(210, 200, 200)
+props['flesh' ] = core.color(200, 200, 100)
+props['skin'  ] = core.color(255, 200, 200)
+props['muscle'] = core.color(150,  50,  50)
+ui.panels.pytools.AddTool("Material Color", props, setMaterialColors, "This tool sets material colors.")

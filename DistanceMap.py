@@ -1,10 +1,8 @@
-# @fbs { 
-#  "name" : "Distance map",
-#  "info" : "This tool runs the distance map tool on a post model."
-# }
+# This script runs the distance map tool on a post model."
+# (use co02.xplt for this example!)
 from fbs import post
 
-# get the active model (use co02.xplt for this example!)
+# get the active model
 postModel = post.GetActiveModel()
 
 # Get the mesh

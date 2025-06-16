@@ -1,7 +1,4 @@
-# @fbs { 
-#  "name" : "Extract Plot Data",
-#  "info" : "This tool extracts data from a post model."
-# }
+#  This script extracts data from a post model."
 from fbs import post
 
 postModel = post.GetActiveModel()

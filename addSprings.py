@@ -1,16 +1,7 @@
-# @fbs {
-#   "name" : "Add Springs",
-#   "info" : "This tool adds some springs",
-#   "args" : {
-#      "name" : "",
-#      "file" : { "type" : "url", "value" : "" },
-#      "tol" : 0.1,
-#      "Type" : { "type" : "enum", "value" : ["Linear", "Nonlinear", "Hill"] },
-#      "intersect" : { "type" : "bool", "value" : 0 }
-#    }
-# }
-from fbs import ui, mdl, core, mesh, args
 # Add Springs tool
+# Open the leaflets.vtk file first. 
+# Then use the chordae.csv file to read the springs
+from fbs import *
 
 class Spring:
     
@@ -97,39 +88,45 @@ def IntersectWithObject(o, r0, r1, tol):
             if ((q - r0).Length() < (r1 - r0).Length()):
                 r1 = q
 
-name = args['name']
-file = args['file']
-tol  = args['tol']
-type = args['Type']
-intersect = args['intersect']
-typeStr = type[1]
+def addSprings(name, file, tol, type, intersect):
 
-springs = []
+    springs = []
 
-ui.panels.pytools.SetProgressText("Reading springs from " + file)
-with open(file) as f:
-    for line in f.readlines():
-        springs.append(Spring(line))
+    #ui.panels.pytools.SetProgressText("Reading springs from " + file)
+    with open(file) as f:
+        for line in f.readlines():
+            springs.append(Spring(line))
 
-fem = mdl.GetActiveModel()
+    fem = mdl.GetActiveModel()
 
-springSet = fem.AddSpringSet(name, typeStr)
+    springSet = fem.AddSpringSet(name, type[1])
 
-# get the currently selected object
-o = mdl.GetActiveObject()
+    # get the currently selected object
+    o = mdl.GetActiveObject()
 
-allNodes = GetAllNodes(o)
+    allNodes = GetAllNodes(o)
 
-ui.panels.pytools.SetProgressText("Adding springs to springset")
-index = 0
-for spring in springs:
-    ui.panels.pytools.SetProgress(index/len(springs))
-    index += 1
+    # ui.panels.pytools.SetProgressText("Adding springs to springset")
+    index = 0
+    for spring in springs:
+        #ui.panels.pytools.SetProgress(index/len(springs))
+        index += 1
 
-    if intersect:
-        IntersectWithObject(o, spring.r0, spring.r1, tol)
+        if intersect:
+            IntersectWithObject(o, spring.r0, spring.r1, tol)
 
-    n1 = FindOrMakeGNode(o, allNodes, spring.r0, tol)
-    n2 = FindOrMakeGNode(o, allNodes, spring.r1, tol)
+        n1 = FindOrMakeGNode(o, allNodes, spring.r0, tol)
+        n2 = FindOrMakeGNode(o, allNodes, spring.r1, tol)
     
-    springSet.AddSpring(n1, n2)
+        springSet.AddSpring(n1, n2)
+
+# Create the properties for the tool.
+props = {}
+props['name'] = "test"
+props['file'] = "@url:" # this will make this property a resource property. You can define an initial value after the colon
+props['tol']= 0.1
+props['type'] = ["Linear", "Nonlinear", "Hill"]
+props['intersect'] = False
+
+# add the tool to the panel
+ui.panels.pytools.AddTool("Add Springs", props, addSprings)

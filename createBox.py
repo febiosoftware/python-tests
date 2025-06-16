@@ -1,23 +1,18 @@
-# @fbs {
-#  "name" : "Create Box",
-#  "info" : "This tool creates a box.",
-#  "args" : { 
-#    "Width"  : 1, 
-#    "Depth"  : 1, 
-#    "Height" : 1, 
-#    "position" : { "type" : "vec3", "value" : [0,0,0] } 
-#  }
-# }
-from fbs import mdl, geom, args
-W = args['Width']
-H = args['Height']
-D = args['Depth']
-pos = args['position']
+from fbs import *
 
-# get the active model
-fem = mdl.GetActiveModel()
+#define the tool's properties
+props = {}
+props['Width'] = 1.0
+props['Height'] = 1.0
+props['Depth'] = 1.0
+props['Position'] = core.vec3d(0,0,0)
 
-# create the box
-box = fem.AddBox(int(W), int(H), int(D))
-box.name = "box1"
-box.pos = pos
+# this is the function that will be called by FBS
+def applyTool(Width, Height, Depth, Position):
+    fem = mdl.GetActiveModel()
+    box = fem.AddBox(Width, Height, Depth)
+    box.name = "box1"
+    box.pos = Position
+
+# add the tool to the UI
+ui.panels.pytools.AddTool("Create Box", props, applyTool)

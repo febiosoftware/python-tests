@@ -1,22 +1,4 @@
-# @fbs {
-#  "name" : "Make Curve",
-#  "info" : "This tool creates a solid mesh from a curve",
-#  "args" : {
-#    "File" : { "type" : "url", "value" : "" },
-#    "Radius" : 1,
-#    "Division" : { "type" : "int", "value" : 4 },
-#    "Segments" : { "type" : "int", "value" : 4 },
-#    "Ratio" : 0.5
-#  }
-# }
-from fbs import mdl, geom, mesh, core, args, ui
-
-# get the tool's arguments
-file = args['File']
-radius = args['Radius']
-divs = args['Division']
-segs = args['Segments']
-ratio = args['Ratio']
+from fbs import *
 
 # read the points from a file
 def readPositionsFromFile(filename):
@@ -63,7 +45,7 @@ def meshFromCurve(points, radius, ndiv, nseg, ratio):
         newMesh.Node(node).pos = nodePositions[node]
 
     for point in range(0, len(points) - 1):
-        ui.panels.pytools.SetProgress(point/len(points))
+#        ui.panels.pytools.SetProgress(point/len(points))
         for element in range(0, discMesh.Elements()):
             # For each element, grab the corresponding element from the disc mesh so 
             # that we can use that node connectivity.
@@ -90,12 +72,25 @@ def meshFromCurve(points, radius, ndiv, nseg, ratio):
     newMesh.RebuildMesh(60.0, False)
     return newMesh
 
-positions = readPositionsFromFile(file)
+# this is the function that will be called by the tool
+def makeCurve(file, radius, divisions, segments, ratio):
+    positions = readPositionsFromFile(file)
 
-# create a new mesh
-mesh = meshFromCurve(positions, radius, divs, segs, ratio)
+    # create a new mesh
+    mesh = meshFromCurve(positions, radius, divisions, segments, ratio)
 
-# construct a mesh-object
-fem = mdl.GetActiveModel()
-o = fem.AddMeshObject(mesh)
-o.name = "curve"
+    # construct a mesh-object
+    fem = mdl.GetActiveModel()
+    o = fem.AddMeshObject(mesh)
+    o.name = "curve"
+
+# define the tool's properties
+props = {}
+props['file'] = "@url:"
+props['radius'] = 1.0
+props['divisions'] = 4
+props['segments'] = 4
+props['ratio'] = 0.5
+
+# add the tool
+ui.panels.pytools.AddTool("Make Curve", props, makeCurve, "This tool creates a solid mesh from a curve.")
