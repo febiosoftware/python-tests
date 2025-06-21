@@ -22,10 +22,10 @@ def setMaterialColors(bone, flesh, skin, muscle):
 
     print("done")
 
-# define the tool's props
-props = {}
-props['bone'  ] = core.color(210, 200, 200)
-props['flesh' ] = core.color(200, 200, 100)
-props['skin'  ] = core.color(255, 200, 200)
-props['muscle'] = core.color(150,  50,  50)
-ui.panels.pytools.AddTool("Material Color", props, setMaterialColors, "This tool sets material colors.")
+if __name__ == "__main__":
+    bone   = core.color(210, 200, 200)
+    flesh  = core.color(200, 200, 100)
+    skin   = core.color(255, 200, 200)
+    muscle = core.color(150,  50,  50)
+    setMaterialColors(bone, flesh, skin, muscle)
+    

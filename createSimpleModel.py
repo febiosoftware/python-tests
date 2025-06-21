@@ -18,12 +18,6 @@ def createSimpleModel(Width, Height, Depth, position):
     # create a step
     step = fem.AddStep("Step1", "solid")
 
-# Build the tool's property list
-props = {}
-props['Width'] = 1.0
-props['Height'] = 1.0
-props['Depth'] = 1.0
-props['position'] = core.vec3d(0,0,0)
-
-# add the tool
-ui.panels.pytools.AddTool("Simple Model", props, createSimpleModel, "Create a simple model.")
+if __name__ == "__main__":
+    createSimpleModel(1,1,1, core.vec3d(0,0,0))
+    

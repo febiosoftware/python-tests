@@ -88,7 +88,7 @@ def IntersectWithObject(o, r0, r1, tol):
             if ((q - r0).Length() < (r1 - r0).Length()):
                 r1 = q
 
-def addSprings(name, file, tol, type, intersect):
+def addSprings(name, file, tol, typeName, intersect):
 
     springs = []
 
@@ -99,7 +99,7 @@ def addSprings(name, file, tol, type, intersect):
 
     fem = mdl.GetActiveModel()
 
-    springSet = fem.AddSpringSet(name, type[1])
+    springSet = fem.AddSpringSet(name, typeName)
 
     # get the currently selected object
     o = mdl.GetActiveObject()
@@ -120,13 +120,7 @@ def addSprings(name, file, tol, type, intersect):
     
         springSet.AddSpring(n1, n2)
 
-# Create the properties for the tool.
-props = {}
-props['name'] = "test"
-props['file'] = "@url:" # this will make this property a resource property. You can define an initial value after the colon
-props['tol']= 0.1
-props['type'] = ["Linear", "Nonlinear", "Hill"]
-props['intersect'] = False
-
-# add the tool to the panel
-ui.panels.pytools.AddTool("Add Springs", props, addSprings)
+if __name__ == "__main__":
+    # TODO: Set the filename
+    fileName = "" 
+    addSprings("springs", fileName, 0.1, "Linear", False)

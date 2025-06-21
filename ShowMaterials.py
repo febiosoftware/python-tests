@@ -33,12 +33,9 @@ def showMaterials(bone, skin, flesh, muscle):
 
     print("done")
 
-# define the tool props
-props = {}
-props['bone'  ] = True
-props['flesh' ] = True
-props['skin'  ] = True
-props['muscle'] = True
-
-# add the tool
-ui.panels.pytools.AddTool("Show Materials", props, showMaterials, "This tool shows or hides tissues.")
+if __name__ == "__main__":
+    bone   = True
+    skin   = True
+    flesh  = True
+    muscle = True
+    showMaterials(bone, skin, flesh, muscle)

@@ -28,10 +28,8 @@ def readCurve(file, closeCurve):
     curve = fem.AddCurveMeshObject(curveMesh)
     curve.name = "CurveObject"
 
-# define the tool's properties
-props = {}
-props['file'] = "@url:"
-props['closeCurve'] = False
 
-# add the tool
-ui.panels.pytools.AddTool("Read Curve", props, readCurve, "This tool reads a curve from a file.")
+if __name__ == "__main__":
+    # TODO: Set the name of the file
+    file = ""
+    readCurve(file, False)

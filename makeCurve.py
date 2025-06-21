@@ -84,13 +84,7 @@ def makeCurve(file, radius, divisions, segments, ratio):
     o = fem.AddMeshObject(mesh)
     o.name = "curve"
 
-# define the tool's properties
-props = {}
-props['file'] = "@url:"
-props['radius'] = 1.0
-props['divisions'] = 4
-props['segments'] = 4
-props['ratio'] = 0.5
-
-# add the tool
-ui.panels.pytools.AddTool("Make Curve", props, makeCurve, "This tool creates a solid mesh from a curve.")
+if __name__ == "__main__":
+    # TODO: set filename
+    fileName = ""
+    makeCurve(fileName, 1.0, 4, 5, 0.5)
