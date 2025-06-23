@@ -88,11 +88,10 @@ def IntersectWithObject(o, r0, r1, tol):
             if ((q - r0).Length() < (r1 - r0).Length()):
                 r1 = q
 
-def addSprings(name, file, tol, typeName, intersect):
+def addSprings(o, name, file, tol, typeName, intersect):
 
     springs = []
 
-    #ui.panels.pytools.SetProgressText("Reading springs from " + file)
     with open(file) as f:
         for line in f.readlines():
             springs.append(Spring(line))
@@ -101,15 +100,10 @@ def addSprings(name, file, tol, typeName, intersect):
 
     springSet = fem.AddSpringSet(name, typeName)
 
-    # get the currently selected object
-    o = mdl.GetActiveObject()
-
     allNodes = GetAllNodes(o)
 
-    # ui.panels.pytools.SetProgressText("Adding springs to springset")
     index = 0
     for spring in springs:
-        #ui.panels.pytools.SetProgress(index/len(springs))
         index += 1
 
         if intersect:
@@ -121,6 +115,9 @@ def addSprings(name, file, tol, typeName, intersect):
         springSet.AddSpring(n1, n2)
 
 if __name__ == "__main__":
-    # TODO: Set the filename
-    fileName = "" 
-    addSprings("springs", fileName, 0.1, "Linear", False)
+
+    fem = mdl.GetActiveModel()
+    o = fem.ImportGeometryFromFile("leaflets.vtk")
+
+    fileName = "chordae.csv" 
+    addSprings(o, "springs", fileName, 0.1, "Linear", False)

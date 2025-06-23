@@ -30,6 +30,5 @@ def readCurve(file, closeCurve):
 
 
 if __name__ == "__main__":
-    # TODO: Set the name of the file
-    file = ""
+    file = "MarkupsCurve_1.csv"
     readCurve(file, False)

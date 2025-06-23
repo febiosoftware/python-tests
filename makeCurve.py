@@ -85,6 +85,5 @@ def makeCurve(file, radius, divisions, segments, ratio):
     o.name = "curve"
 
 if __name__ == "__main__":
-    # TODO: set filename
-    fileName = ""
+    fileName = "MarkupsCurve_1.csv"
     makeCurve(fileName, 1.0, 4, 5, 0.5)
