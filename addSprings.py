@@ -1,123 +1,94 @@
 # Add Springs tool
 # Open the leaflets.vtk file first. 
 # Then use the chordae.csv file to read the springs
-from fbs import *
+from dataclasses import dataclass
+import csv
+from fbs import core, mesh, mdl
 
+@dataclass
 class Spring:
-    
-    def __init__(self, coords):
-        splitCoords = coords.split(",")
-        
-        x = float(splitCoords[1])
-        y = float(splitCoords[2])
-        z = float(splitCoords[3])
-        
-        self.r0 = core.vec3d(x,y,z)
-        
-        x = float(splitCoords[4])
-        y = float(splitCoords[5])
-        z = float(splitCoords[6])
-        
-        self.r1 = core.vec3d(x,y,z)
+    r0: core.vec3d
+    r1: core.vec3d
 
-# get all the nodes of the object's mesh
-# in global coordinates
-def GetAllNodes(o):
-    m = o.GetFEMesh()
-    N = m.Nodes()
-    allNodes = []
-    for i in range(0,N):
-        ni = m.Node(i)
-        ri = m.LocalToGlobal(ni.pos)
-        allNodes.append(ri)
-    return allNodes
-
-# finds the closest node (or -1 if not found)
-def FindClosestNode(nodeList, r, tol):
-    N = len(nodeList)
-    imin = -1
-    l2min = 0.0
-    for i in range(0,N):
-        ri = nodeList[i]
-        l2 = (r - ri).SqrLength()
-        if (imin == -1) or (l2 < l2min):
-            imin = i
-            l2min = l2
-
-    if (imin != -1) and (l2min < tol*tol):
-        return imin
-    
-    return -1
-
-# This function finds the closest node on the object's mesh (using the pre-calculated node position list).
-# If it exists, then it's marked as a required node. If not, it gets added to the object.
-def FindOrMakeGNode(o, nodeList, r, tol):
-    N = len(nodeList)
-    imin = FindClosestNode(nodeList, r, tol)
-
-    if (imin != -1):
-        return o.MakeGNode(imin)
-    
-    return o.AddNode(r)
-
-def IntersectWithObject(o, r0, r1, tol):
-    femesh = o.GetFEMesh()
-
-    n = r1 - r0
-    n.Normalize()
-
-    intersections = mesh.FindAllIntersections(femesh, r0, n, True)
-    for i in range(0, len(intersections)):
-        q = intersections[i]
-
-        # does the projection lie within tolerance
-        d = (q - r0).Length()
-        if d < tol:
-            # does it decrease the distance
-            if ((r1 - q).Length() < (r1 - r0).Length()):
-                r0 = q
-
-    intersections = mesh.FindAllIntersections(femesh, r1, -n, True)
-    for i in range(0, len(intersections)):
-        q = intersections[i]
-
-        # does the projection lie within tolerance
-        d = (q - r1).Length()
-        if (d < tol):
-            # does it decrease the distance
-            if ((q - r0).Length() < (r1 - r0).Length()):
-                r1 = q
-
-def addSprings(o, name, file, tol, typeName, intersect):
-
+def read_springs(filename):
     springs = []
 
-    with open(file) as f:
-        for line in f.readlines():
-            springs.append(Spring(line))
+    with open(filename, newline="") as f:
+        for row in csv.reader(f):
+            springs.append(Spring(
+                core.vec3d(float(row[1]), float(row[2]), float(row[3])),
+                core.vec3d(float(row[4]), float(row[5]), float(row[6])),
+            ))
 
-    fem = mdl.GetActiveModel()
+    return springs
 
-    springSet = fem.AddSpringSet(name, typeName)
+def closest_node_index(positions, r, tol):
+    tol2 = tol * tol
+    best = min(
+        enumerate(positions),
+        key=lambda item: (r - item[1]).sqr_length(),
+        default=None,
+    )
 
-    allNodes = GetAllNodes(o)
+    if best is None:
+        return None
 
-    index = 0
-    for spring in springs:
-        index += 1
+    index, pos = best
+    return index if (r - pos).sqr_length() < tol2 else None
+
+def find_or_add_node(obj, positions, r, tol):
+    index = closest_node_index(positions, r, tol)
+    if index is not None:
+        return obj.get_or_create_geometry_node(index)
+
+    return obj.add_node(r)
+
+def intersect_with_object(obj, r0, r1, tol):
+    direction = (r1 - r0).normalized()
+
+    for q in mesh.find_all_intersections(obj.fe_mesh, r0, direction, True):
+        if (q - r0).length() < tol and (r1 - q).length() < (r1 - r0).length():
+            r0 = q
+
+    for q in mesh.find_all_intersections(obj.fe_mesh, r1, -direction, True):
+        if (q - r1).length() < tol and (q - r0).length() < (r1 - r0).length():
+            r1 = q
+
+    return r0, r1
+
+def add_springs(o, name, file, tol, typeName, intersect):
+
+    fem = mdl.active_model()
+    spring_set = fem.discrete_objects.add_spring_set(name, typeName)
+    
+    T = o.transform
+    
+    print("collecting nodal positions ...")
+    node_positions = [T.local_to_global(node.pos) for node in o.fe_mesh.nodes]
+    
+    print("creating springs ...")
+    for spring in read_springs(file):
+        r0, r1 = spring.r0, spring.r1
 
         if intersect:
-            IntersectWithObject(o, spring.r0, spring.r1, tol)
+            r0, r1 = intersect_with_object(obj, r0, r1, tol)        
 
-        n1 = FindOrMakeGNode(o, allNodes, spring.r0, tol)
-        n2 = FindOrMakeGNode(o, allNodes, spring.r1, tol)
-    
-        springSet.AddSpring(n1, n2)
+        n1 = find_or_add_node(o, node_positions, r0, tol)
+        n2 = find_or_add_node(o, node_positions, r1, tol)
+
+        spring_set.springs.add(n1, n2)
+
 
 if __name__ == "__main__":
 
-    fem = mdl.GetActiveModel()
-    o = fem.ImportGeometryFromFile("leaflets.vtk")
+    fem = mdl.active_model()
+    fem.clear()
+    
+    print("importing file ...")
+    o = fem.objects.import_file("leaflets.vtk")
 
     fileName = "chordae.csv" 
-    addSprings(o, "springs", fileName, 0.1, "Linear", False)
+
+    add_springs(o, "springs", fileName, 0.1, "Linear", False)
+
+

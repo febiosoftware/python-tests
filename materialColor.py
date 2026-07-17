@@ -4,21 +4,21 @@ from fbs import *
 def setMaterialColors(bone, flesh, skin, muscle):
     print("Starting engines ...")
 
-    fem = post.GetActiveModel()
-    nmat = fem.Materials()
+    fem = post.active_model()
+    nmat = len(fem.materials)
     print("There are " + str(nmat) + " materials.")
 
-    for i in range(nmat):
-        m = fem.Material(i)
-        name = m.name
-        if ("skin" in name)or("Skin" in name):
-            m.SetColor(skin.r, skin.g, skin.b)
-        elif ("bone" in name)or("Bone" in name)or("teeth" in name)or("Clavicle" in name)or("Sternum" in name)or("Rib" in name):
-            m.SetColor(bone.r, bone.g, bone.b)
-        elif ("flesh" in name)or("Flesh" in name)or("cartilage" in name)or("Cartilage" in name):
-            m.SetColor(flesh.r, flesh.g, flesh.b)
+    for material in fem.materials:
+        name = material.name.lower()
+
+        if "skin" in name:
+            material.color = skin
+        elif any(term in name for term in ["bone", "teeth", "clavicle", "sternum", "rib"]):
+            material.color = bone
+        elif any(term in name for term in ["flesh", "cartilage"]):
+            material.color = flesh
         else:
-            m.SetColor(muscle.r, muscle.g, muscle.b)
+            material.color = muscle
 
     print("done")
 

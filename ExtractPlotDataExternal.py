@@ -2,35 +2,30 @@ import sys
 from fbs import post, core
 
 # 1. this opens the plot file and returns an object that contains the data
-postModel = post.ReadPlotFile("co02.xplt")
+#model = post.read_plot_file("co02.xplt")
+model = post.active_model()
 
 # 2. the following is optional, but in case you want to see what fields are stored in the plot file
-# get the data manager 
-manager = postModel.GetDataManager()
+print(f"Number of data fields: {len(model.data_fields)}")
 
-nrfields = manager.DataFields()
-print("Number of datafields : " + str(nrfields))
-if (nrfields == 0):
+if not model.data_fields:
     print("hmm, something is not right ...\n")
     sys.exit(1)
 
-for i in range(manager.DataFields()):
-    df = manager.DataField(i)
+for df in model.data_fields:
     print(df.name)
 
 # 3. extract data and print it
-# get a handle to retrieve a particular data field
-dataField = postModel.GetDataField("Lagrange strain")
-
 # evaluate the datafield on the model. Returns a state object that contains the data
-state = postModel.Evaluate(dataField, post.MAT3DS.EFFECTIVE, postModel.States() - 1)
+state = model.states[-1]
+state.evaluate("Lagrange strain", post.MAT3DS.EFFECTIVE)
 
 # retrieve the state's element data
-elemData = state.elemData
+elemData = state.elem_data
 
-# retrieve the mesh
-mesh = postModel.GetFEMesh(0)
+# retrieve the FE mesh
+mesh = state.fe_mesh
 
 # output the data for each element
-for index in range(mesh.Elements()):
-    print(str(index) + ", " + str(elemData[index].val))
+for elem in mesh.elements:
+    print(str(elem.id) + ", " + str(elemData[elem.index].val))

@@ -1,20 +1,20 @@
-#  This script extracts data from a post model."
+# This script extracts data from a post model.
+# use co02.xplt as an example
 from fbs import post
 
-postModel = post.GetActiveModel()
+model = post.active_model()
 
-dataField = postModel.GetDataField("stress")
+# get the last state of the model
+state = model.states[-1]
 
-# I think this changes the internal state of the post-model.
-# Is this a problem?
-state = postModel.Evaluate(dataField, post.MAT3DS.P1, postModel.States() - 1)
+# evaluate the stress field
+state.evaluate("stress", post.MAT3DS.P1)
 
-faceData = state.faceData
+# get the face data
+faceData = state.face_data
 
-mesh = postModel.GetFEMesh(0)
-for index in range(mesh.Surfaces()):
-    surface = mesh.Surface(index)
-    print(surface.GetName())
-    faces = surface.GetFaceIndices()
-    for face in faces:
-        print(str(face) + ", " + str(faceData[face].val))
+mesh = state.fe_mesh
+for surface in mesh.surfaces:
+    print(surface.name)
+    for face in surface.faces:
+        print(str(face.id) + ", " + str(faceData[face.index].val))

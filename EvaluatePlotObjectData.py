@@ -1,15 +1,16 @@
+# todo: this example doesn't work yet!!
 from fbs import *
 
-fem = post.GetActiveModel()
+fem = post.active_model()
 
-po = fem.GetPlotObject("Material2")
+po = fem.plot_objects["Material2"]
 
-data = po.GetDataField("Force")
+data = po.data_fields["Force"]
 
-print(po.Name())
+print(po.name)
 
-numStates = fem.States()
+numStates = len(fem.states)
 print(numStates)
 for i in range(numStates):
-	a = fem.EvaluatePlotObject(po, data, 0, i)
+	a = fem.evaluate_plot_object(po, data, 0, i)
 	print(i, a)

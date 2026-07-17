@@ -1,18 +1,10 @@
-from fbs import *
+from fbs import post
 
 # Get the active model
-fem = post.GetActiveModel()
-
-# choose a data field to integrate
-dataField = fem.GetDataField("stress")
-
-# get the mesh
-mesh = fem.GetFEMesh(0)
-
-# get the element set to integrate over
-elset = mesh.FindElemSet("Part1")
+fem = post.active_model()
+#fem = post.read_plot_file("Model1.xplt")
 
 # loop over all states and integrate the data field over the element set
-for state in range(0,fem.States()):
-	val = post.IntegrateElements(fem, elset, dataField, post.MAT3DS.P1, state)
-	print(state, val)
+for state in fem.states:
+	val = state.integrate_elements("Part1", "stress", "P1")
+	print(state.time, val)

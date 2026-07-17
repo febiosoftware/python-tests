@@ -15,18 +15,23 @@ def readPositionsFromFile(filename):
 
 # this is the function that will be called by the tool
 def readCurve(file, closeCurve):
-    positions = readPositionsFromFile(file)
 
-    # create a new curve mesh
-    curveMesh = mesh.CurveMesh()
-    curveMesh.CreateFromPoints(positions, closeCurve)
+    print("Reading points ...")
+    positions = readPositionsFromFile(file)
+    print(f"{len(positions)} points read.")
 
     # get the active model
-    fem = mdl.GetActiveModel()
+    fem = mdl.active_model()
+    fem.clear()
 
-    # construct a mesh-object
-    curve = fem.AddCurveMeshObject(curveMesh)
-    curve.name = "CurveObject"
+    # construct a curve mesh-object
+    o = fem.objects.add_curve_mesh_object("CurveObject")
+    curveMesh = o.geometry_mesh
+
+    print("building curve mesh ...")
+    curveMesh.create_from_points(positions, closeCurve)
+    o.update_geometry()
+    print("Done!")
 
 
 if __name__ == "__main__":

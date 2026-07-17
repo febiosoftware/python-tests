@@ -1,35 +1,26 @@
 from fbs import *
 
+def has_any(name, terms):
+    name = name.lower()
+    return any(term in name for term in terms)
+
 def showMaterials(bone, skin, flesh, muscle):
     print("Starting engines ...")
 
-    fem = post.GetActiveModel()
-    nmat = fem.Materials()
+    fem = post.active_model()
+    nmat = len(fem.materials)
     print("There are " + str(nmat) + " materials.")
 
-    for i in range(nmat):
-        m = fem.Material(i)
+    for m in fem.materials:
         name = m.name
-        if ("bone" in name)or("Bone" in name)or("teeth" in name)or("Clavicle" in name)or("Sternum" in name)or("Rib" in name):
-            if bone:
-                m.Show()
-            else:
-                m.Hide()
-        elif ("skin" in name)or("Skin" in name):
-            if skin:
-                m.Show()
-            else:
-                m.Hide()
-        elif ("flesh" in name)or("Flesh" in name)or("cartilage" in name)or("Cartilage" in name):
-            if flesh:
-                m.Show()
-            else:
-                m.Hide()
+        if has_any(name, ["bone", "teeth", "clavicle", "sternum", "rib"]):
+            m.visible = bone
+        elif has_any(name, ["skin"]):
+            m.visible = skin
+        elif has_any(name, ["flesh", "cartilage"]):
+            m.visible = flesh
         else:
-            if muscle:
-                m.Show()
-            else:
-                m.Hide()
+            m.visible = muscle
 
     print("done")
 
