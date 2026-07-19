@@ -3,12 +3,13 @@
 # Then use the chordae.csv file to read the springs
 from dataclasses import dataclass
 import csv
-from fbs import core, mesh, mdl
+import fbs
+from fbs import core, mesh
 
 @dataclass
 class Spring:
-    r0: core.vec3d
-    r1: core.vec3d
+    r0: core.Vec3
+    r1: core.Vec3
 
 def read_springs(filename):
     springs = []
@@ -16,8 +17,8 @@ def read_springs(filename):
     with open(filename, newline="") as f:
         for row in csv.reader(f):
             springs.append(Spring(
-                core.vec3d(float(row[1]), float(row[2]), float(row[3])),
-                core.vec3d(float(row[4]), float(row[5]), float(row[6])),
+                core.Vec3(float(row[1]), float(row[2]), float(row[3])),
+                core.Vec3(float(row[4]), float(row[5]), float(row[6])),
             ))
 
     return springs
@@ -58,7 +59,7 @@ def intersect_with_object(obj, r0, r1, tol):
 
 def add_springs(o, name, file, tol, typeName, intersect):
 
-    fem = mdl.active_model()
+    fem = fbs.active_model()
     spring_set = fem.discrete_objects.add_spring_set(name, typeName)
     
     T = o.transform
@@ -71,7 +72,7 @@ def add_springs(o, name, file, tol, typeName, intersect):
         r0, r1 = spring.r0, spring.r1
 
         if intersect:
-            r0, r1 = intersect_with_object(obj, r0, r1, tol)        
+            r0, r1 = intersect_with_object(o, r0, r1, tol)
 
         n1 = find_or_add_node(o, node_positions, r0, tol)
         n2 = find_or_add_node(o, node_positions, r1, tol)
@@ -81,7 +82,7 @@ def add_springs(o, name, file, tol, typeName, intersect):
 
 if __name__ == "__main__":
 
-    fem = mdl.active_model()
+    fem = fbs.active_model()
     fem.clear()
     
     print("importing file ...")

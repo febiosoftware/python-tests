@@ -1,10 +1,10 @@
-# NOTE: To run this script, open FEBio Studio and start a new model. Then, use the menu **Tools --> Python Editor** to open the Python editor window.
-#       Then, copy/paste this code in the editor and run it.
-
-from fbs import mdl
+# NOTE: To run this script, open FEBio Studio and start a new model.
+#       Then, use the menu **Tools --> Python Editor** to open the Python editor window.
+#       Finally, copy/paste this code in the editor and run it.
+import fbs
 
 # get the active model
-fem = mdl.active_model()
+fem = fbs.active_model()
 #fem.clear()
 
 # add a box to the model

@@ -1,9 +1,9 @@
 # This script runs the distance map tool on a post model."
 # (use co02.xplt for this example!)
-from fbs import post
+import fbs
 
 # get the active model
-postModel = post.active_model()
+postModel = fbs.active_post_model()
 
 # Get the mesh
 mesh = postModel.fe_meshes[0]

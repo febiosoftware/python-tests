@@ -1,7 +1,7 @@
-from fbs import mdl
+import fbs
 
 # Get the currently active (build) model 
-fem = mdl.active_model()
+fem = fbs.active_model()
 
 # import an object from a file
 skull = fem.objects.import_file("skull.vtp")

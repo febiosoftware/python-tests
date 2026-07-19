@@ -1,4 +1,4 @@
-from fbs import *
+import fbs
 
 def has_any(name, terms):
     name = name.lower()
@@ -7,7 +7,7 @@ def has_any(name, terms):
 def showMaterials(bone, skin, flesh, muscle):
     print("Starting engines ...")
 
-    fem = post.active_model()
+    fem = fbs.active_post_model()
     nmat = len(fem.materials)
     print("There are " + str(nmat) + " materials.")
 

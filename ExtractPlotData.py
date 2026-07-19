@@ -1,8 +1,8 @@
 # This script extracts data from a post model.
 # use co02.xplt as an example
-from fbs import post
+import fbs
 
-model = post.active_model()
+model = fbs.active_post_model()
 
 # get the last state of the model
 state = model.states[-1]

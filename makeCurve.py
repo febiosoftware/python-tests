@@ -1,4 +1,4 @@
-from fbs import *
+import fbs
 
 # read the points from a file
 def readPositionsFromFile(filename):
@@ -10,7 +10,7 @@ def readPositionsFromFile(filename):
             y = float(splitCoords[1])
             z = float(splitCoords[2])
         
-            positions.append(core.vec3d(x,y,z))
+            positions.append(fbs.core.Vec3(x,y,z))
     return positions
 
 # this is the function that creates the curve
@@ -18,7 +18,7 @@ def makeCurve(file, radius, divisions, segments, ratio):
     print("Reading points from file: " + file)
     points = readPositionsFromFile(file)
 
-    model = mdl.active_model()
+    model = fbs.active_model()
     model.clear()
 
     disc = model.objects.add("tmp", "disc", R=radius)
@@ -31,13 +31,13 @@ def makeCurve(file, radius, divisions, segments, ratio):
     for point in range(0, len(points)):
         # Rotate the disc 
         if point == 0:
-            vec1 = core.vec3d(0,0,1)
-            vec2 = (points[point + 1] - points[point]).Normalize()
-            T.rotate(core.quatd(vec1, vec2), core.vec3d(0,0,0))
+            vec1 = fbs.core.Vec3(0,0,1)
+            vec2 = (points[point + 1] - points[point]).normalize()
+            T.rotate(fbs.core.Quaternion(vec1, vec2), fbs.core.Vec3(0,0,0))
         elif (point != len(points) - 1):
-            vec1 = (points[point] - points[point - 1]).Normalize()
-            vec2 = (points[point + 1] - points[point]).Normalize()
-            T.rotate(core.quatd(vec1, vec2), points[point - 1])
+            vec1 = (points[point] - points[point - 1]).normalize()
+            vec2 = (points[point + 1] - points[point]).normalize()
+            T.rotate(fbs.core.Quaternion(vec1, vec2), points[point - 1])
 
         # Move the disc into position
         T.position = points[point]
@@ -71,7 +71,7 @@ def makeCurve(file, radius, divisions, segments, ratio):
             # number of previous points in our curve
             eid = element + numDiscElements * point
             current = newMesh.elements[eid]
-            current.set_type(mesh.ElementType.FE_HEX8)
+            current.set_type(fbs.mesh.ElementType.FE_HEX8)
 
             nelNodes = len(discElement.nodes)
 

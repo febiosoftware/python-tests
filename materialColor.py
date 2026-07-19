@@ -1,10 +1,10 @@
 # This tool demonstrates how to set the material colors in a post model.
-from fbs import *
+import fbs
 
 def setMaterialColors(bone, flesh, skin, muscle):
     print("Starting engines ...")
 
-    fem = post.active_model()
+    fem = fbs.active_post_model()
     nmat = len(fem.materials)
     print("There are " + str(nmat) + " materials.")
 
@@ -23,9 +23,8 @@ def setMaterialColors(bone, flesh, skin, muscle):
     print("done")
 
 if __name__ == "__main__":
-    bone   = core.color(210, 200, 200)
-    flesh  = core.color(200, 200, 100)
-    skin   = core.color(255, 200, 200)
-    muscle = core.color(150,  50,  50)
+    bone   = fbs.core.Color(210, 200, 200)
+    flesh  = fbs.core.Color(200, 200, 100)
+    skin   = fbs.core.Color(255, 200, 200)
+    muscle = fbs.core.Color(150,  50,  50)
     setMaterialColors(bone, flesh, skin, muscle)
-    

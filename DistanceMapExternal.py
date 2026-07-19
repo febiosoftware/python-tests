@@ -1,7 +1,7 @@
-from fbs import post
+import fbs
 
 # Open the file
-postModel = post.read_plot_file("co02.xplt")
+postModel = fbs.read_plot_file("co02.xplt")
 
 # Get the mesh
 mesh = postModel.fe_meshes[0]

@@ -1,4 +1,4 @@
-from fbs import *
+import fbs
 
 # read the points from a file
 def readPositionsFromFile(filename):
@@ -10,7 +10,7 @@ def readPositionsFromFile(filename):
             y = float(splitCoords[1])
             z = float(splitCoords[2])
         
-            positions.append(core.vec3d(x,y,z))
+            positions.append(fbs.core.Vec3(x,y,z))
     return positions
 
 # this is the function that will be called by the tool
@@ -21,7 +21,7 @@ def readCurve(file, closeCurve):
     print(f"{len(positions)} points read.")
 
     # get the active model
-    fem = mdl.active_model()
+    fem = fbs.active_model()
     fem.clear()
 
     # construct a curve mesh-object

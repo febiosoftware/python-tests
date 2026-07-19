@@ -1,7 +1,7 @@
 # todo: this example doesn't work yet!!
-from fbs import *
+import fbs
 
-fem = post.active_model()
+fem = fbs.active_post_model()
 
 po = fem.plot_objects["Material2"]
 
