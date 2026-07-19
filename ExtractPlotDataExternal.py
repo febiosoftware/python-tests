@@ -2,7 +2,7 @@ import sys
 import fbs
 
 # 1. this opens the plot file and returns an object that contains the data
-model = fbs.read_plot_file("co02.xplt")
+model = fbs.post_models.open("co02.xplt")
 
 # 2. the following is optional, but in case you want to see what fields are stored in the plot file
 print(f"Number of data fields: {len(model.data_fields)}")
