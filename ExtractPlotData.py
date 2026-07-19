@@ -8,7 +8,7 @@ model = post.active_model()
 state = model.states[-1]
 
 # evaluate the stress field
-state.evaluate("stress", post.MAT3DS.P1)
+state.evaluate(("stress", "p1"))
 
 # get the face data
 faceData = state.face_data

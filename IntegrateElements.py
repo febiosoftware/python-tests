@@ -6,5 +6,5 @@ fem = post.active_model()
 
 # loop over all states and integrate the data field over the element set
 for state in fem.states:
-	val = state.integrate_elements("Part1", "stress", "P1")
+	val = state.integrate_elements("Part1", ("stress", "p1"))
 	print(state.time, val)

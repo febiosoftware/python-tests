@@ -18,7 +18,7 @@ for df in model.data_fields:
 # 3. extract data and print it
 # evaluate the datafield on the model. Returns a state object that contains the data
 state = model.states[-1]
-state.evaluate("Lagrange strain", post.MAT3DS.EFFECTIVE)
+state.evaluate(("Lagrange strain", "effective"))
 
 # retrieve the state's element data
 elemData = state.elem_data
